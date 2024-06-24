@@ -22,6 +22,14 @@ const roomSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  minBookingPeriod: {
+    type: Number,
+    required: true
+  },
+  maxBookingPeriod: {
+    type: Number,
+    required: true
+  },
   rentAmount: {
     type: Number,
     required: true

@@ -2,7 +2,7 @@ const Room = require("../models/roomModel");
 
 // Create a new room
 const createRoom = async (req, res) => {
-  const { ownerId, name, floorSize, numberOfBeds, amenities, rentAmount } =
+  const { ownerId, name, floorSize, numberOfBeds, amenities,minBookingPeriod, maxBookingPeriod, rentAmount } =
     req.body;
   try {
     const room = new Room({
@@ -11,6 +11,8 @@ const createRoom = async (req, res) => {
       floorSize,
       numberOfBeds,
       amenities,
+      minBookingPeriod,
+      maxBookingPeriod,
       rentAmount,
     });
     await room.save();
