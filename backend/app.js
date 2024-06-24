@@ -1,7 +1,9 @@
 const express = require('express');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
+const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const roomRoutes = require('./routes/roomRoutes');
 
 const app = express();
 
@@ -15,7 +17,9 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // Routes
+app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
+app.use('/room', roomRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
