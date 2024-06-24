@@ -1,20 +1,24 @@
 const express = require('express');
 const router = express.Router();
+
+const authenticate = require('../models/authenticate');
 const roomController = require('../controllers/roomControllers');
+const validate = require('../middlewares/validate');
+const roomValidation = require('../validations/roomValidation');
 
 // Create a new room
-router.post('/', roomController.createRoom);
+router.post('/create',authenticate, validate(roomController.createRoom), roomController.createRoom);
 
 // Get all rooms
-router.get('/', roomController.getAllRooms);
+router.get('/details', roomController.getAllRooms);
 
 // Get room by ID
-router.get('/:id', roomController.getRoomById);
+router.post('/detailById', roomController.getRoomById);
 
 // Update room by ID
-router.put('/:id', roomController.updateRoom);
+router.put('/update', authenticate, validate(roomController.updateRoom), roomController.updateRoom);
 
 // Delete room by ID
-router.delete('/:id', roomController.deleteRoom);
+router.delete('/delete', authenticate, validate(roomController.deleteRoom), roomController.deleteRoom);
 
 module.exports = router;

@@ -8,13 +8,17 @@ const userValidation = require('../validations/userValidation');
 
 // create User
 router.post('/create',authenticate, validate(userValidation.create), userController.createUser);
+
 // get all users
-router.get('/',authenticate, userController.getUsers);
+router.get('/details',authenticate, userController.getUsers);
+
 // get user by id
-router.get('/:id',authenticate, userController.getUserById);
+router.post('/detailById',authenticate, userController.getUserById);
+
 // update user by id
-router.put('/:id',authenticate, validate(userValidation.update), userController.updateUser);
+router.put('/update',authenticate, validate(userValidation.update), userController.updateUser);
+
 // delete user by id
-router.delete('/:id',authenticate, userController.deleteUser);
+router.delete('/delete',authenticate, userController.deleteUser);
 
 module.exports = router;
