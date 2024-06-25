@@ -6,9 +6,9 @@ const idRule = Joi.string()
   .regex(/^[0-9a-fA-F]{24}$/) // Regex to match MongoDB ObjectId format
   .messages({
     "string.pattern.base": "Invalid Room Id format",
-    "any.required": "ID is required",
-    "string.empty": "ID cannot be empty",
-    "string.base": "ID must be a string",
+    "any.required": "Room Id is required",
+    "string.empty": "Room Id cannot be empty",
+    "string.base": "Room Id must be a string",
   });
 
 const nameRule = Joi.string().required().messages({

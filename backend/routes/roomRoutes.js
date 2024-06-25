@@ -14,7 +14,7 @@ router.post('/create', validate(roomValidation.create), roomController.createRoo
 router.get('/details', roomController.getAllRooms);
 
 // Get room by ID
-router.post('/detailById', roomController.getRoomById);
+router.post('/detailById',validate(roomValidation.getById), roomController.getRoomById);
 
 // Update room by ID
 router.put('/update',  validate(roomValidation.update), roomController.updateRoom);
