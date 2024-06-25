@@ -40,37 +40,62 @@ const ownerIdRule = Joi.string().required().messages({
   "string.base": "Owner ID must be a string",
 });
 
-// ReUsable Validations
+const minBookingPeriodRule = Joi.number().required().messages({
+  "any.required": "Minimum booking period is required",
+  "number.base": "Minimum booking period must be a number",
+});
 
-const roomSchema = Joi.object({
-  ownerId: ownerIdRule,
+const maxBookingPeriodRule = Joi.number().required().messages({
+  "any.required": "Maximum booking period is required",
+  "number.base": "Maximum booking period must be a number",
+});
+
+// ReUsable Validations
+const createRoomsSchema = Joi.object({
   name: nameRule,
   floorSize: floorSizeRule,
   numberOfBeds: numberOfBedsRule,
   amenities: amenitiesRule,
   rentAmount: rentAmountRule,
+  minBookingPeriod: minBookingPeriodRule,
+  maxBookingPeriod: maxBookingPeriodRule,
 });
 
-// const createMultipleRoomsSchema = Joi.array()
-//   .items(roomSchema)
-//   .min(1)
-//   .required()
-//   .messages({
-//     "any.required": "At least one room must be provided",
-//     "array.base": "Rooms must be an array",
-//     "array.min": "At least one room must be provided",
-//   });
+const updateRoomSchema = Joi.object({
+  id: idRule,
+  name: nameRule.optional(),
+  floorSize: floorSizeRule.optional(),
+  numberOfBeds: numberOfBedsRule.optional(),
+  amenities: amenitiesRule.optional(),
+  rentAmount: rentAmountRule.optional(),
+  minBookingPeriod: minBookingPeriodRule.optional(),
+  maxBookingPeriod: maxBookingPeriodRule.optional(),
+});
+
+const createRoomsValidation = Joi.object({
+  ownerId: ownerIdRule,
+  rooms: Joi.array().items(createRoomsSchema).min(1).required().messages({
+    "any.required": "At least one room must be provided",
+    "array.base": "Rooms must be an array",
+    "array.min": "At least one room must be provided",
+  }),
+});
+
+const updateRoomsValidation = Joi.object({
+  rooms: Joi.array()
+  .items(updateRoomSchema)
+  .min(1)
+  .required()
+  .messages({
+    "any.required": "At least one room must be provided",
+    "array.base": "Rooms must be an array",
+    "array.min": "At least one room must be provided",
+  }),
+})
 
 const roomValidation = {
-  create: roomSchema,
-  update: Joi.object({
-    id: idRule,
-    name: nameRule.optional(),
-    floorSize: floorSizeRule.optional(),
-    numberOfBeds: numberOfBedsRule.optional(),
-    amenities: amenitiesRule.optional(),
-    rentAmount: rentAmountRule.optional(),
-  }).min(1),
+  create: createRoomsValidation,
+  update: updateRoomsValidation,
 
   getById: Joi.object({
     id: idRule,

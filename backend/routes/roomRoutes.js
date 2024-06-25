@@ -7,7 +7,8 @@ const validate = require('../middlewares/validate');
 const roomValidation = require('../validations/roomValidation');
 
 // Create a new room
-router.post('/create',authenticate, validate(roomController.createRoom), roomController.createRoom);
+// router.post('/create',authenticate, validate(roomController.createRoom), roomController.createRoom);
+router.post('/create', validate(roomValidation.create), roomController.createRoom);
 
 // Get all rooms
 router.get('/details', roomController.getAllRooms);
@@ -16,7 +17,7 @@ router.get('/details', roomController.getAllRooms);
 router.post('/detailById', roomController.getRoomById);
 
 // Update room by ID
-router.put('/update', authenticate, validate(roomController.updateRoom), roomController.updateRoom);
+router.put('/update',  validate(roomValidation.update), roomController.updateRoom);
 
 // Delete room by ID
 router.delete('/delete', authenticate, validate(roomController.deleteRoom), roomController.deleteRoom);
