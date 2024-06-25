@@ -36,7 +36,7 @@ const createUser = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select(['-password']);
     res.json({
       status: 1,
       message: "users details!",
@@ -50,7 +50,7 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const { id } = req.body;
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).select(['-password']);
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({
       status: 1,

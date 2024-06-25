@@ -13,7 +13,7 @@ const createRoom = async (req, res) => {
     res.status(201).json({
       status: 1,
       message: "Rooms created successfully!",
-      responseData: createdRooms,
+      // responseData: createdRooms,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -52,7 +52,7 @@ const updateRoom = async (req, res) => {
     res.status(200).json({
       status: 1,
       message: "Rooms updated successfully!",
-      rooms: updatedRooms,
+      // rooms: updatedRooms,
     });
   } catch (error) {
     if (error.message.includes("Room")) {
