@@ -4,8 +4,7 @@ const Room = require("../models/roomModel");
 const createRoom = async (req, res) => {
   const { ownerId, rooms } = req.body;
   try {
-
-    rooms.forEach(room => {
+    rooms.forEach((room) => {
       room.ownerId = ownerId;
     });
 
@@ -13,7 +12,7 @@ const createRoom = async (req, res) => {
 
     res.status(201).json({
       status: 1,
-      message: "Rooms created successfully",
+      message: "Rooms created successfully!",
       responseData: createdRooms,
     });
   } catch (error) {
@@ -24,26 +23,43 @@ const createRoom = async (req, res) => {
 // Update room by ID
 const updateRoom = async (req, res) => {
   const { rooms } = req.body;
-  try {
-    const updatePromises = rooms.map(async (room) => {
-      const updatedRoom = await Room.findByIdAndUpdate(room.id, room, {
-        new: true,
-        runValidators: true,
-      });
-      if (!updatedRoom) {
-        return res.status(404).json({ message: `Room ${room.id} not found` });
-      }
-      return updatedRoom;
-    });
 
-    const updatedRooms = await Promise.all(updatePromises);
+  try {
+    // Validate all rooms before update
+    for (const room of rooms) {
+      const existingRoom = await Room.findById(room.roomId);
+      if (!existingRoom) {
+        throw new Error(`Room Id ${room.roomId} not found`);
+      }
+    }
+
+    // If all rooms exist, update all room
+    const updatedRooms = await Promise.all(
+      rooms.map(async (room) => {
+        const updatedRoom = await Room.findByIdAndUpdate(room.roomId, room, {
+          new: true,
+          runValidators: true,
+        });
+
+        if (!updatedRoom) {
+          throw new Error(`Failed to update Room Id ${room.roomId}`);
+        }
+
+        return updatedRoom;
+      })
+    );
+
     res.status(200).json({
       status: 1,
-      message: "Rooms updated successfully",
+      message: "Rooms updated successfully!",
       rooms: updatedRooms,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    if (error.message.includes("Room")) {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 };
 
@@ -51,7 +67,7 @@ const updateRoom = async (req, res) => {
 const getAllRooms = async (req, res) => {
   try {
     const rooms = await Room.find();
-    res.json({ status: 1, message: "All rooms fetched successfully", rooms });
+    res.json({ status: 1, message: "All rooms details!", rooms });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -59,28 +75,27 @@ const getAllRooms = async (req, res) => {
 
 // Get room by ID
 const getRoomById = async (req, res) => {
-  const { id } = req.body;
+  const { roomId } = req.body;
   try {
-    const room = await Room.findById(id);
+    const room = await Room.findById(roomId);
     if (!room) {
-      return res.status(404).json({ message: "Room not found" });
+      return res.status(404).json({ message: "Room not found!" });
     }
-    res.json({ status: 1, message: "Room found", room });
+    res.json({ status: 1, message: "Room found!", room });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-
 // Delete room by ID
 const deleteRoom = async (req, res) => {
-  const { id } = req.body;
+  const { roomId } = req.body;
   try {
-    const room = await Room.findByIdAndDelete(id);
+    const room = await Room.findByIdAndDelete(roomId);
     if (!room) {
-      return res.status(404).json({ message: "Room not found" });
+      return res.status(404).json({ message: "Room not found!" });
     }
-    res.json({ status: 1, message: "Room deleted successfully" });
+    res.json({ status: 1, message: "Room deleted successfully!" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

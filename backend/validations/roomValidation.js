@@ -2,11 +2,14 @@ const Joi = require("joi");
 
 // DRY, KISS Principle Follows
 
-const idRule = Joi.string().required().messages({
-  "any.required": "ID is required",
-  "string.empty": "ID cannot be empty",
-  "string.base": "ID must be a string",
-});
+const idRule = Joi.string()
+  .regex(/^[0-9a-fA-F]{24}$/) // Regex to match MongoDB ObjectId format
+  .messages({
+    "string.pattern.base": "Invalid Room Id format",
+    "any.required": "ID is required",
+    "string.empty": "ID cannot be empty",
+    "string.base": "ID must be a string",
+  });
 
 const nameRule = Joi.string().required().messages({
   "any.required": "Name is required",
@@ -62,7 +65,7 @@ const createRoomsSchema = Joi.object({
 });
 
 const updateRoomSchema = Joi.object({
-  id: idRule,
+  roomId: idRule,
   name: nameRule.optional(),
   floorSize: floorSizeRule.optional(),
   numberOfBeds: numberOfBedsRule.optional(),
@@ -82,27 +85,23 @@ const createRoomsValidation = Joi.object({
 });
 
 const updateRoomsValidation = Joi.object({
-  rooms: Joi.array()
-  .items(updateRoomSchema)
-  .min(1)
-  .required()
-  .messages({
+  rooms: Joi.array().items(updateRoomSchema).min(1).required().messages({
     "any.required": "At least one room must be provided",
     "array.base": "Rooms must be an array",
     "array.min": "At least one room must be provided",
   }),
-})
+});
 
 const roomValidation = {
   create: createRoomsValidation,
   update: updateRoomsValidation,
 
   getById: Joi.object({
-    id: idRule,
+    roomId: idRule,
   }),
 
   delete: Joi.object({
-    id: idRule,
+    roomId: idRule,
   }),
 };
 
