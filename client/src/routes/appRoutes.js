@@ -10,7 +10,7 @@ import {
 import GuestGuard from "../guards/GuestGuard";
 import LoginForm from "../pages/auth/login";
 import RegisterForm from "../pages/auth/register";
-import Dash from "../pages/dash";
+import Dash from "../pages/dashboard";
 import { Paths } from "./Paths";
 import AuthGuard from "../guards/AuthGuard";
 import DashTwo from "../pages/dashTwo";
