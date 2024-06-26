@@ -1,6 +1,7 @@
 const ROOTS = {
   AUTH: "/auth",
   DASHBOARD: "/dashboard",
+  ROOMS: "/rooms"
 };
 
 export const Paths = {
@@ -12,7 +13,13 @@ export const Paths = {
   // Dashboard routes
   dashboard: {
     root: ROOTS.DASHBOARD,
-    one: `${ROOTS.DASHBOARD}/one`,
-    two: `${ROOTS.DASHBOARD}/two`,
+    dashboard: `${ROOTS.DASHBOARD}/users`,
+    manageRooms: `${ROOTS.DASHBOARD}/manageRooms`,
+    userAddEdit: `${ROOTS.DASHBOARD}/userAddEdit`,
+    addEditRooms: `${ROOTS.DASHBOARD}/addEditRooms`,
+  },
+  rooms: {
+    userRoom: `${ROOTS.ROOMS}/userRoom`,
+    bookRoom: `${ROOTS.ROOMS}/bookRoom`,
   },
 };

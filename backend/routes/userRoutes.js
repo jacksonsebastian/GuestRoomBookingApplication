@@ -19,6 +19,6 @@ router.post('/detailById',authenticate, userController.getUserById);
 router.put('/update',authenticate, validate(userValidation.update), userController.updateUser);
 
 // delete user by id
-router.delete('/delete',authenticate, userController.deleteUser);
+router.delete('/delete',authenticate, validate(userValidation.delete), userController.deleteUser);
 
 module.exports = router;

@@ -1,13 +1,134 @@
-body {
+*{
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.container {
+  max-width: 1640px;
+  margin: auto;
+  padding: 20px;
+  position: relative;
+}
+
+table {
+  width: -webkit-fill-available;
+  border-collapse: collapse;
+  margin-top: 20px;
+  
+}
+
+.rooms-table th, .rooms-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+}
+
+th{
+  padding: 35px;
+}
+
+.rooms-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+  font-weight: bold;
+}
+
+.rooms-table td {
+  text-align: left;
+  width: 100%;
+}
+
+.table_row {
+  border-bottom: 1px solid gainsboro;
+}
+
+.room_amenities {
+  display: flex;
+  flex-direction: column;
+}
+
+.amenity {
+  display: flex;
+  row-gap: 10px;
+  background-color: #f1f1f1;
+  border: 1px solid #ddd;
+  padding: 4px 8px;
+  margin-right: 4px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.manageBooking_create{
+  background-color: #86d467;
+  color: white;
+  padding: 5px 6px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.manageBooking_btn {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 6px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.manageBooking_btn:hover {
+  background-color: #0056b3;
+}
+
+
+
+/* form */
+.actions{
+  display: flex;
+  flex-direction: column;
+  row-gap: 5px;
+}
+
+.delete_btn{
+  background-color: red;
+  color: white;
+  padding: 5px 6px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete_btn:hover{
+  background-color: brown;
+}
+
+/* room booking */
+.create_btn{
+  background-color: #86d467;
+  color: white;
+  padding: 5px 6px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  position: absolute;
+  right: 11px;
+  top: 30px;
+}
+/* roombooking */
+.roomBooking{
+padding: 20px;
+border-radius: 10px;
+}
+
+.roomBooking_btn{
+  background-color: #86d467;
+  color: white;
+  padding: 5px 6px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.roomBooking_btn:hover{
+  background-color: #52863d;
 }

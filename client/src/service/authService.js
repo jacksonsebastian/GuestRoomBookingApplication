@@ -38,6 +38,7 @@ const register = async (userData) => {
 
 const logout = () => {
   localStorage.removeItem("token");
+  window.location.reload();
 };
 
 export { login, register, logout };

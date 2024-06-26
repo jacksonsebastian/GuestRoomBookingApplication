@@ -1,6 +1,14 @@
 const Joi = require("joi");
 
 // DRY, KISS Principle Follows
+const idRule = Joi.string()
+  .regex(/^[0-9a-fA-F]{24}$/) // Regex to match MongoDB ObjectId format
+  .messages({
+    "string.pattern.base": "Invalid Room Id format",
+    "any.required": "Room Id is required",
+    "string.empty": "Room Id cannot be empty",
+    "string.base": "Room Id must be a string",
+  });
 
 const nameRule = Joi.string().required().messages({
   "any.required": "Name is required",
@@ -18,8 +26,7 @@ const passwordRule = Joi.string()
   .min(6)
   .pattern(new RegExp("^[a-zA-Z0-9@]{3,30}$"))
   .messages({
-    "string.pattern.base":
-      'Password must contain only letters, numbers, or "@" and be between 3 and 30 characters long.',
+    "string.pattern.base":'Password must contain only letters, numbers, or "@" and be between 3 and 30 characters long.',
     "string.min": "Password must be at least 6 characters long",
     "any.required": "Password is required",
     "string.empty": "Password cannot be empty",
@@ -67,6 +74,7 @@ const userValidation = {
       "object.missing": "Email or Phone is required to login",
     }),
   update: Joi.object({
+    id: idRule,
     name: Joi.string().messages({
       "string.base": "Name must be a string",
     }),
@@ -81,7 +89,11 @@ const userValidation = {
         "string.length": "Phone number must be exactly 10 digits long.",
         "string.pattern.base": "Phone number is invalid.",
       }),
+    role: roleRule,
   }).min(1),
+  delete: Joi.object({
+    id: idRule,
+  }),
 };
 
 module.exports = userValidation;

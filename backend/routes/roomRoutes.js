@@ -20,6 +20,6 @@ router.post('/detailById',validate(roomValidation.getById), roomController.getRo
 router.put('/update',  validate(roomValidation.update), roomController.updateRoom);
 
 // Delete room by ID
-router.delete('/delete', authenticate, validate(roomController.deleteRoom), roomController.deleteRoom);
+router.delete('/delete', authenticate, validate(roomValidation.delete), roomController.deleteRoom);
 
 module.exports = router;
