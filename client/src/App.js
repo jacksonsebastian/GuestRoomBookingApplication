@@ -1,16 +1,16 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import LoginForm from "./pages/auth/login.tsx";
-import RegisterForm from "./pages/auth/register.tsx";
+import { AuthProvider } from "./hooks/useAuthContext.js";
+import AppRoutes from "./routes/appRoutes.js";
+
 
 function App() {
   return (
-    <div className="App">
-      <div className="container">
-        <LoginForm />
-        <RegisterForm />
+    <AuthProvider>
+      <div className="App">
+        <AppRoutes />
       </div>
-    </div>
+    </AuthProvider>
   );
 }
 

@@ -1,16 +1,9 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import axios from "axios";
-import React from "react";
-
-interface RegisterFormInputs {
-  name: string;
-  email: string;
-  password: string;
-  phone: string;
-}
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthContext } from "../../hooks/useAuthContext";
 
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
@@ -24,33 +17,41 @@ const RegisterSchema = Yup.object().shape({
 });
 
 const RegisterForm = () => {
+  const { registerUser, error } = useAuthContext();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<RegisterFormInputs>({
+  } = useForm({
     resolver: yupResolver(RegisterSchema),
   });
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (data: RegisterFormInputs) => {
+  useEffect(() => {
+    setErrorMessage(null);
+    if (error) {
+      setErrorMessage(error ? error : "Server error, Please try again!");
+    }
+  }, [error]);
+
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      const response = await axios.post(
-        "http://your-api-endpoint/register",
-        data
-      );
-      console.log("Registration successful:", response.data);
-      // Handle successful registration, e.g., redirect to login page
+      await registerUser(data);
+      setErrorMessage(null);
+      reset();
+      navigate("/auth/login"); // Redirect to login page after successful registration
     } catch (error) {
       console.error("Registration error:", error);
-      setErrorMessage("Registration failed. Please try again.");
-      reset();
+      setErrorMessage(
+        error.message ? error.message : "Server error, Please try again!"
+      );
     } finally {
-      reset();
       setIsSubmitting(false);
     }
   };
@@ -148,6 +149,12 @@ const RegisterForm = () => {
                   </button>
                 </div>
               </form>
+              <div className="mt-3 text-center">
+                <p>
+                  Already an account?
+                  <Link to="/auth/login"> Login! </Link>
+                </p>
+              </div>
             </div>
           </div>
         </div>

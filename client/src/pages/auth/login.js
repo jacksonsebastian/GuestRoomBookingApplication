@@ -1,9 +1,9 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import axios from "axios";
-import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthContext } from "../../hooks/useAuthContext";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
@@ -18,6 +18,9 @@ const defaultValues = {
 };
 
 const LoginForm = () => {
+  const { loginUser, error } = useAuthContext();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -28,23 +31,31 @@ const LoginForm = () => {
     defaultValues,
   });
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (data: any) => {
+  useEffect(() => {
+    setErrorMessage(null);
+    if (error) {
+      setErrorMessage(error ? error : "Server error, Please try again!");
+    }
+  }, [error]);
+
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      const response = await axios.post("http://your-api-endpoint/login", data);
-      console.log("Login successful:", response.data);
+      await loginUser(data.email, data.password);
+      navigate("/dashboard"); // Redirect to dashboard
     } catch (error) {
       console.error("Login error:", error);
       setErrorMessage(
         error.message ? error.message : "Server error, Please try again!"
       );
-      reset();
     } finally {
-      reset();
       setIsSubmitting(false);
+      if (!errorMessage) {
+        reset();
+      }
     }
   };
 
@@ -92,25 +103,9 @@ const LoginForm = () => {
                     </div>
                   )}
                 </div>
-                {/* Toast */}
+                {/* Error message */}
                 {errorMessage && (
                   <div className="alert alert-danger">{errorMessage}</div>
-                  // <div
-                  //   className="toast align-items-center text-white bg-primary border-0"
-                  //   role="alert"
-                  //   aria-live="assertive"
-                  //   aria-atomic="true"
-                  // >
-                  //   <div className="d-flex">
-                  //     <div className="toast-body">{errorMessage}</div>
-                  //     <button
-                  //       type="button"
-                  //       className="btn-close btn-close-white me-2 m-auto"
-                  //       data-bs-dismiss="toast"
-                  //       aria-label="Close"
-                  //     ></button>
-                  //   </div>
-                  // </div>
                 )}
                 <div className="d-grid">
                   <button
@@ -122,6 +117,12 @@ const LoginForm = () => {
                   </button>
                 </div>
               </form>
+              <div className="mt-3 text-center">
+                <p>
+                  Don't have an account?
+                  <Link to="/auth/register"> Register here </Link>
+                </p>
+              </div>
             </div>
           </div>
         </div>
