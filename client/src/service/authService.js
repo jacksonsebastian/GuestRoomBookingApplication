@@ -1,11 +1,10 @@
 import axios from "axios";
-
-const API_BASE_URL = "http://localhost:5000";
+import config from "../config";
 
 const login = async (credentials) => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/auth/login`,
+      `${config.apiUrl}/auth/login`,
       credentials
     );
     if (response.data.status === 1) {
@@ -23,7 +22,7 @@ const login = async (credentials) => {
 const register = async (userData) => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/auth/register`,
+      `${config.apiUrl}/auth/register`,
       userData
     );
     if (response?.data?.status === 1) {
