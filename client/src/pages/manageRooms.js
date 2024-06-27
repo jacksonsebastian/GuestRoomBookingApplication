@@ -12,7 +12,7 @@ const ManageRooms = () => {
 
   const fetchRooms = async () => {
     try {
-      const response = await axios.get("/room/details");
+      const response = await axios.post("/room/details");
       setRooms(response.data.rooms);
       setLoading(false); // Set loading to false after data is fetched
     } catch (error) {

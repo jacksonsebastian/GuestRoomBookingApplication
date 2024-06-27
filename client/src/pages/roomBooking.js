@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from "react";
+import axiosInstance from "../service/axiosInstance";
+
+const imageUrls = [
+  "/images/hotel-room.webp",
+  "/images/hotel-room1.webp",
+  "/images/hotel-room2.webp",
+  "/images/hotel-room3.webp",
+];
 
 const RoomBooking = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [adults, setAdults] = useState(1);
-  const [children, setChildren] = useState(0);
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [endDateError, setEndDateError] = useState("");
   const [adultsError, setAdultsError] = useState("");
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
 
   useEffect(() => {
     // Set the start date to the current date
@@ -14,7 +24,27 @@ const RoomBooking = () => {
     setStartDate(today);
   }, []);
 
-  const handleSearch = () => {
+  const fetchRooms = async () => {
+    try {
+      const response = await axiosInstance.post("/room/details");
+      setRooms(
+        response.data.rooms.map((room) => ({
+          ...room,
+          randomImage: imageUrls[Math.floor(Math.random() * imageUrls.length)], // Assign random image to each room
+        }))
+      );
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching room details:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRooms();
+  }, []);
+
+  const handleSearch = async () => {
     let formIsValid = true;
 
     // Validate adults count
@@ -34,12 +64,26 @@ const RoomBooking = () => {
     }
 
     if (formIsValid) {
-      console.log({
-        startDate,
-        endDate,
-        adults,
-        children,
-      });
+      try {
+        setLoading(true);
+        const response = await axiosInstance.post("/room/details", {
+          params: {
+            startDate,
+            endDate,
+          },
+        });
+        setRooms(
+          response.data.rooms.map((room) => ({
+            ...room,
+            randomImage:
+              imageUrls[Math.floor(Math.random() * imageUrls.length)], // Assign random image to each room
+          }))
+        );
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching rooms:", error);
+        setLoading(false);
+      }
     } else {
       console.error("Form validation failed");
     }
@@ -50,7 +94,7 @@ const RoomBooking = () => {
       <h3>Room Booking</h3>
       <div className="row mb-3 text-left">
         <div className="col-md-3">
-          <label className="form-label">Start Date</label>
+          <label className="form-label">Check-in Date</label>
           <input
             type="date"
             className="form-control"
@@ -60,7 +104,7 @@ const RoomBooking = () => {
           />
         </div>
         <div className="col-md-3">
-          <label className="form-label">End Date</label>
+          <label className="form-label">Check-out Date</label>
           <input
             type="date"
             className="form-control"
@@ -100,51 +144,66 @@ const RoomBooking = () => {
             onChange={(e) => setChildren(e.target.value)}
           />
         </div>
-        <div className="col-md-2 d-flex align-items-center justify-content-center">
+        <div className="col-md-2 d-flex align-items-end justify-content-start">
           <button className="btn btn-primary" onClick={handleSearch}>
             Search
           </button>
         </div>
       </div>
 
-      <div
-        className="row mb-3 roomBooking"
-        style={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 12px" }}
-      >
-        <div className="col-md-3">
-          <img src="/1.jpg" alt="hey" />
-        </div>
-
-        <div className="col-md-6 text-start">
-          <h3>Name</h3>
-          <div className="row">
-            <div className="col-md-6 text-start">
-              <p>Location</p>
-              <div>
-                <p>Min Booking Period</p>
-                <p>Max Booking Period</p>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        rooms.map((room) => (
+          <div
+            key={room._id}
+            className="row mb-3 roomBooking"
+            style={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 12px" }}
+          >
+            <div className="col-md-3">
+              <div className="room-image-container">
+                <img src={room.randomImage} alt="Room" className="img-fluid" />
               </div>
             </div>
             <div className="col-md-6 text-start">
+              <h3>{room.name}</h3>
+              <div className="row">
+                <div className="col-md-6 text-start">
+                  <div>
+                    <p>Min Booking Period: {room.minBookingPeriod} days</p>
+                    <p>Max Booking Period: {room.maxBookingPeriod} days</p>
+                  </div>
+                </div>
+                <div className="col-md-6 text-start">
+                  <div>
+                    <p>No. of Beds: {room.numberOfBeds}</p>
+                    <p>Amenities: {room.amenities.join(", ")}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-3 d-flex flex-column justify-content-between align-items-end">
+              <div className="text-left">
+                <p>Rent Per Day: Rs.{room.rentAmount} + GST Applied</p>
+              </div>
               <div>
-                <p>No. of Beds:</p>
-                <p>Amenities:</p>
+                <p>Status: {room.isBooked === 1 ? "Booked" : "Available"}</p>
+                <button
+                  className="roomBooking_btn"
+                  disabled={room.isBooked === 1}
+                  style={{
+                    background: room.isBooked === 1 ? "gray" : "",
+                    cursor: room.isBooked === 1 ? "not-allowed" : "pointer",
+                  }}
+                  onClick={() => console.log("Check:")}
+                >
+                  Book Now
+                </button>
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="col-md-3 d-flex flex-column justify-content-between align-items-end">
-          <div className="">
-            <p>Rent Amount: </p>
-            <p>Rent Per Day: </p>
-          </div>
-          <div className="">
-            <p>Status: </p>
-            <button className="roomBooking_btn">Book Now</button>
-          </div>
-        </div>
-      </div>
+        ))
+      )}
     </div>
   );
 };

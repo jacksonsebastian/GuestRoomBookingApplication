@@ -64,14 +64,57 @@ const updateRoom = async (req, res) => {
 };
 
 // Get all rooms
+// const getAllRooms = async (req, res) => {
+//   try {
+//     const rooms = await Room.find();
+//     res.json({ status: 1, message: "All rooms details!", rooms });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 const getAllRooms = async (req, res) => {
+  const { startDate, endDate } = req.body;
+
   try {
-    const rooms = await Room.find();
-    res.json({ status: 1, message: "All rooms details!", rooms });
+    let query = {};
+
+    // Check if startDate and endDate are provided and not empty
+    if (startDate && endDate && startDate !== "" && endDate !== "") {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      const bookingPeriod = calculateBookingPeriod(start, end);
+
+      query = {
+        minBookingPeriod: { $lte: bookingPeriod },
+        maxBookingPeriod: { $gte: bookingPeriod }
+      };
+    }
+
+    const rooms = await Room.find(query);
+
+    res.json({ status: 1, message: "Rooms details fetched successfully!", rooms });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Helper function to calculate booking period in days
+function calculateBookingPeriod(startDate, endDate) {
+  const diffTime = Math.abs(endDate - startDate);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+  return diffDays;
+}
+
+
+// Helper function to calculate booking period in days
+function calculateBookingPeriod(startDate, endDate) {
+  const diffTime = Math.abs(endDate - startDate);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Adding 1 to include both start and end dates
+  return diffDays;
+}
+
+
 
 // Get room by ID
 const getRoomById = async (req, res) => {

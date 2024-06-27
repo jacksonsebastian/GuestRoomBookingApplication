@@ -19,7 +19,6 @@ export const Paths = {
     addEditRooms: `${ROOTS.DASHBOARD}/addEditRooms`,
   },
   rooms: {
-    userRoom: `${ROOTS.ROOMS}/userRoom`,
     bookRoom: `${ROOTS.ROOMS}/bookRoom`,
   },
 };

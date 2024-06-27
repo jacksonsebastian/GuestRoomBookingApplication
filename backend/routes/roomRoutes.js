@@ -11,7 +11,7 @@ const roomValidation = require('../validations/roomValidation');
 router.post('/create', validate(roomValidation.create), roomController.createRoom);
 
 // Get all rooms
-router.get('/details', roomController.getAllRooms);
+router.post('/details', roomController.getAllRooms);
 
 // Get room by ID
 router.post('/detailById',validate(roomValidation.getById), roomController.getRoomById);
