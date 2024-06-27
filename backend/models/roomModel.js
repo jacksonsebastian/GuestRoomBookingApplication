@@ -33,7 +33,13 @@ const roomSchema = new mongoose.Schema({
   rentAmount: {
     type: Number,
     required: true
-  }
+  },
+  bookingStatus: {
+    startDate: { type: Date },
+    endDate: { type: Date },
+    adults: { type: Number },
+    children: { type: Number, default: 0 },
+  },
 }, { timestamps: true });
 
 const Room = mongoose.model('Room', roomSchema);

@@ -18,6 +18,7 @@ router.post('/detailById',validate(roomValidation.getById), roomController.getRo
 
 // Update room by ID
 router.put('/update',  validate(roomValidation.update), roomController.updateRoom);
+router.post('/createBooking', roomController.createBooking);
 
 // Delete room by ID
 router.delete('/delete', authenticate, validate(roomValidation.delete), roomController.deleteRoom);

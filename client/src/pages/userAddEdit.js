@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Navbar from "../components/Navbar.js";
 
 const UserAddEdit = () => {
   const location = useLocation();
@@ -99,115 +100,118 @@ const UserAddEdit = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h1>{id ? "Edit User Details" : "Add New User"}</h1>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="row mb-3">
-          <div className="col-md-6 text-start">
-            <label className="mb-2" style={{ fontWeight: "bold" }}>
-              Name:
-            </label>
-            <input
-              type="text"
-              className={`form-control ${errors.name ? "is-invalid" : ""}`}
-              {...register("name")}
-            />
-            <div className="invalid-feedback">{errors.name?.message}</div>
+    <>
+      <Navbar />
+      <div className="container mt-4">
+        <h1>{id ? "Edit User Details" : "Add New User"}</h1>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="row mb-3">
+            <div className="col-md-6 text-start">
+              <label className="mb-2" style={{ fontWeight: "bold" }}>
+                Name:
+              </label>
+              <input
+                type="text"
+                className={`form-control ${errors.name ? "is-invalid" : ""}`}
+                {...register("name")}
+              />
+              <div className="invalid-feedback">{errors.name?.message}</div>
+            </div>
+            <div className="col-md-6 text-start">
+              <label className="mb-2" style={{ fontWeight: "bold" }}>
+                Email
+              </label>
+              <input
+                type="email"
+                className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                {...register("email")}
+              />
+              <div className="invalid-feedback">{errors.email?.message}</div>
+            </div>
           </div>
-          <div className="col-md-6 text-start">
-            <label className="mb-2" style={{ fontWeight: "bold" }}>
-              Email
-            </label>
-            <input
-              type="email"
-              className={`form-control ${errors.email ? "is-invalid" : ""}`}
-              {...register("email")}
-            />
-            <div className="invalid-feedback">{errors.email?.message}</div>
+          <div className="row mb-3">
+            <div className="col-md-6 text-start">
+              <label className="mb-2" style={{ fontWeight: "bold" }}>
+                Phone
+              </label>
+              <input
+                type="text"
+                className={`form-control ${errors.phone ? "is-invalid" : ""}`}
+                {...register("phone")}
+              />
+              <div className="invalid-feedback">{errors.phone?.message}</div>
+            </div>
+            <div className="col-md-6 text-start">
+              <label className="mb-2" style={{ fontWeight: "bold" }}>
+                Role
+              </label>
+              <select
+                className={`form-control ${errors.role ? "is-invalid" : ""}`}
+                {...register("role")}
+              >
+                <option value="" disabled>
+                  Select Role
+                </option>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+              <div className="invalid-feedback">{errors.role?.message}</div>
+            </div>
+            {!id && (
+              <div className="row mb-3">
+                <div className="col-md-6 text-start">
+                  <label className="mb-2" style={{ fontWeight: "bold" }}>
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    className={`form-control ${
+                      errors.password ? "is-invalid" : ""
+                    }`}
+                    {...register("password")}
+                  />
+                  <div className="invalid-feedback">
+                    {errors.password?.message}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-        <div className="row mb-3">
-          <div className="col-md-6 text-start">
-            <label className="mb-2" style={{ fontWeight: "bold" }}>
-              Phone
-            </label>
-            <input
-              type="text"
-              className={`form-control ${errors.phone ? "is-invalid" : ""}`}
-              {...register("phone")}
-            />
-            <div className="invalid-feedback">{errors.phone?.message}</div>
-          </div>
-          <div className="col-md-6 text-start">
-            <label className="mb-2" style={{ fontWeight: "bold" }}>
-              Role
-            </label>
-            <select
-              className={`form-control ${errors.role ? "is-invalid" : ""}`}
-              {...register("role")}
-            >
-              <option value="" disabled>
-                Select Role
-              </option>
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-            <div className="invalid-feedback">{errors.role?.message}</div>
-          </div>
-          {!id && (
-            <div className="row mb-3">
-              <div className="col-md-6 text-start">
-                <label className="mb-2" style={{ fontWeight: "bold" }}>
-                  Password
-                </label>
-                <input
-                  type="password"
-                  className={`form-control ${
-                    errors.password ? "is-invalid" : ""
-                  }`}
-                  {...register("password")}
-                />
-                <div className="invalid-feedback">
-                  {errors.password?.message}
+          <button type="submit" className="btn btn-primary mt-3">
+            {id ? "Update User" : "Add User"}
+          </button>
+        </form>
+
+        {showPopup && (
+          <div
+            className="modal"
+            tabIndex="-1"
+            role="dialog"
+            style={{ display: "block" }}
+          >
+            <div className="modal-dialog" role="document">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Success!</h5>
+                </div>
+                <div className="modal-body">
+                  <p>User {id ? "updated" : "created"} successfully!</p>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={closePopup}
+                  >
+                    OK
+                  </button>
                 </div>
               </div>
             </div>
-          )}
-        </div>
-        <button type="submit" className="btn btn-primary mt-3">
-          {id ? "Update User" : "Add User"}
-        </button>
-      </form>
-
-      {showPopup && (
-        <div
-          className="modal"
-          tabIndex="-1"
-          role="dialog"
-          style={{ display: "block" }}
-        >
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Success!</h5>
-              </div>
-              <div className="modal-body">
-                <p>User {id ? "updated" : "created"} successfully!</p>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={closePopup}
-                >
-                  OK
-                </button>
-              </div>
-            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

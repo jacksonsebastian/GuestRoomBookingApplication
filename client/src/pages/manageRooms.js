@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import axios from "../service/axiosInstance";
 import { Link } from "react-router-dom";
@@ -9,21 +10,31 @@ const ManageRooms = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [roomToDelete, setRoomToDelete] = useState(null);
   const [loading, setLoading] = useState(true); // State to track loading status
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
 
   const fetchRooms = async () => {
     try {
-      const response = await axios.post("/room/details");
+      const response = await axios.post("/room/details", {
+        startDate: "",
+        endDate: "",
+        page,
+        limit,
+      });
       setRooms(response.data.rooms);
       setLoading(false); // Set loading to false after data is fetched
+      setTotalPages(Math.ceil(response.data.totalCount / limit));
     } catch (error) {
       console.error("Error fetching room details:", error);
       setLoading(false); // Set loading to false on error as well
+      setTotalPages(0);
     }
   };
 
   useEffect(() => {
     fetchRooms();
-  }, []);
+  }, [page]);
 
   const handleDeleteRoom = async () => {
     if (!roomToDelete) return;
@@ -48,6 +59,10 @@ const ManageRooms = () => {
   const closeDeleteConfirmation = () => {
     setShowDeleteConfirmation(false);
     setRoomToDelete(null);
+  };
+
+  const handlePageChange = (page) => {
+    setPage(page);
   };
 
   return (
@@ -75,6 +90,7 @@ const ManageRooms = () => {
                 <th>Min Booking Period</th>
                 <th>Number of Beds</th>
                 <th>Floor Size</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -113,6 +129,7 @@ const ManageRooms = () => {
                     <td>{room.maxBookingPeriod}</td>
                     <td>{room.minBookingPeriod}</td>
                     <td>{room.numberOfBeds}</td>
+                    <td>{room.isBooked ? "Booked" : "Available"}</td>
                     <td>{room.floorSize}</td>
                     <td>
                       <div className="d-flex justify-content-between">
@@ -135,7 +152,6 @@ const ManageRooms = () => {
                   </tr>
                 ))
               ) : (
-                // If rooms array is empty
                 <tr>
                   <td colSpan="7" className="text-center">
                     Data not found!
@@ -144,6 +160,63 @@ const ManageRooms = () => {
               )}
             </tbody>
           </table>
+          {rooms.length > 0 && (
+            <div className="d-flex justify-content-end">
+              <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                  <li class="page-item">
+                    <a
+                      className="page-link"
+                      aria-label="Next"
+                      role="button"
+                      disabled={page === 1}
+                    >
+                      <span
+                        role="button"
+                        disabled={page === 1}
+                        aria-hidden="true"
+                        onClick={() => handlePageChange(page - 1)}
+                      >
+                        &laquo;
+                      </span>
+                    </a>
+                  </li>
+                  {Array.from(
+                    { length: totalPages },
+                    (_, index) => index + 1
+                  ).map((data) => (
+                    <li class={`page-item ${data === page ? "active" : ""}`}>
+                      <a
+                        className="page-link"
+                        aria-label="Next"
+                        role="button"
+                        key={data}
+                        onClick={() => handlePageChange(data)}
+                      >
+                        {data}
+                      </a>
+                    </li>
+                  ))}
+                  <li class="page-item">
+                    <a
+                      className="page-link"
+                      aria-label="Next"
+                      role="button"
+                      disabled={page === totalPages}
+                    >
+                      <span
+                        aria-hidden="true"
+                        onClick={() => handlePageChange(page + 1)}
+                        disabled={page === totalPages}
+                      >
+                        &raquo;
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          )}
         </div>
 
         {/* Confirmation Modal */}

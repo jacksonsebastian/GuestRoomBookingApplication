@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../service/axiosInstance";
 
@@ -13,10 +14,17 @@ const RoomBooking = () => {
   const [endDate, setEndDate] = useState("");
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [bookingLoading, setBookingLoading] = useState(false);
   const [endDateError, setEndDateError] = useState("");
   const [adultsError, setAdultsError] = useState("");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [messaege, setMessage] = useState("");
+  const [bookingId, setBookingId] = useState("");
 
   useEffect(() => {
     // Set the start date to the current date
@@ -26,23 +34,31 @@ const RoomBooking = () => {
 
   const fetchRooms = async () => {
     try {
-      const response = await axiosInstance.post("/room/details");
+      const response = await axiosInstance.post("/room/details", {
+        startDate,
+        endDate,
+        page,
+        limit,
+      });
       setRooms(
         response.data.rooms.map((room) => ({
           ...room,
           randomImage: imageUrls[Math.floor(Math.random() * imageUrls.length)], // Assign random image to each room
         }))
       );
+
+      setTotalPages(Math.ceil(response.data.totalCount / limit));
       setLoading(false);
     } catch (error) {
       console.error("Error fetching room details:", error);
       setLoading(false);
+      setTotalPages(0);
     }
   };
 
   useEffect(() => {
     fetchRooms();
-  }, []);
+  }, [page]);
 
   const handleSearch = async () => {
     let formIsValid = true;
@@ -69,6 +85,8 @@ const RoomBooking = () => {
         const response = await axiosInstance.post("/room/details", {
           startDate,
           endDate,
+          limit,
+          page,
         });
         setRooms(
           response.data.rooms.map((room) => ({
@@ -85,6 +103,65 @@ const RoomBooking = () => {
     } else {
       console.error("Form validation failed");
     }
+  };
+
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
+
+  const handleBooking = async (roomId) => {
+    setBookingId(roomId);
+    setBookingLoading(true);
+
+    let formIsValid = true;
+
+    // Validate adults count
+    if (adults < 1) {
+      setAdultsError("Adults must be at least 1");
+      formIsValid = false;
+    } else {
+      setAdultsError("");
+    }
+
+    // Validate end date
+    if (!endDate) {
+      setEndDateError("End date is required");
+      formIsValid = false;
+      setBookingId("");
+      setBookingLoading(false);
+    } else {
+      setEndDateError("");
+    }
+
+    if (formIsValid) {
+      try {
+        const response = await axiosInstance.post("/room/createBooking", {
+          startDate,
+          endDate,
+          adults,
+          children,
+          roomId,
+        });
+
+        if (response.data.status === 1) {
+          setBookingLoading(false);
+          setShowPopup(true);
+          setBookingId("");
+          setMessage(response.data.message);
+        }
+      } catch (error) {
+        console.error("Error Booking:", error.message);
+        setBookingLoading(false);
+        setShowPopup(true);
+        setBookingId("");
+        setMessage(error.response.data.message);
+      }
+    }
+  };
+  console.log("totalPages:", totalPages, page);
+
+  const closePopup = () => {
+    setShowPopup(false);
   };
 
   return (
@@ -107,7 +184,13 @@ const RoomBooking = () => {
             type="date"
             className="form-control"
             value={endDate}
-            min={startDate}
+            min={
+              startDate
+                ? new Date(new Date(startDate).getTime() + 24 * 60 * 60 * 1000)
+                    .toISOString()
+                    .split("T")[0]
+                : ""
+            }
             max={
               startDate
                 ? new Date(
@@ -150,8 +233,10 @@ const RoomBooking = () => {
       </div>
 
       {loading ? (
-        <div>Loading...</div>
-      ) : (
+        <div class="text-center">
+          <div class="spinner-border" role="status"></div>
+        </div>
+      ) : rooms.length > 0 ? (
         rooms.map((room) => (
           <div
             key={room._id}
@@ -160,7 +245,12 @@ const RoomBooking = () => {
           >
             <div className="col-md-3">
               <div className="room-image-container">
-                <img src={room.randomImage} alt="Room" className="img-fluid" />
+                <img
+                  src={room.randomImage}
+                  alt="Room"
+                  className="img-fluid"
+                  loading="lazy"
+                />
               </div>
             </div>
             <div className="col-md-6 text-start">
@@ -193,14 +283,100 @@ const RoomBooking = () => {
                     background: room.isBooked === 1 ? "gray" : "",
                     cursor: room.isBooked === 1 ? "not-allowed" : "pointer",
                   }}
-                  onClick={() => console.log("Check:")}
+                  onClick={() => handleBooking(room._id)}
                 >
-                  Book Now
+                  {bookingLoading && bookingId == room._id
+                    ? "Loading..."
+                    : "Book Now"}
                 </button>
               </div>
             </div>
           </div>
         ))
+      ) : (
+        <div className="text-center">Data not found!</div>
+      )}
+      {rooms.length > 0 && (
+        <div className="d-flex justify-content-end">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination">
+              <li class="page-item">
+                <a
+                  className="page-link"
+                  aria-label="Next"
+                  role="button"
+                  disabled={page === 1}
+                >
+                  <span
+                    aria-hidden="true"
+                    onClick={() => handlePageChange(page - 1)}
+                  >
+                    &laquo;
+                  </span>
+                </a>
+              </li>
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (data) => (
+                  <li class={`page-item ${data === page ? "active" : ""}`}>
+                    <a
+                      className="page-link"
+                      aria-label="Next"
+                      role="button"
+                      key={data}
+                      onClick={() => handlePageChange(data)}
+                    >
+                      {data}
+                    </a>
+                  </li>
+                )
+              )}
+              <li class="page-item">
+                <a
+                  className="page-link"
+                  aria-label="Next"
+                  role="button"
+                  disabled={page === totalPages}
+                >
+                  <span
+                    aria-hidden="true"
+                    onClick={() => handlePageChange(page + 1)}
+                  >
+                    &raquo;
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      )}
+
+      {showPopup && (
+        <div
+          className="modal"
+          tabIndex="-1"
+          role="dialog"
+          style={{ display: "block" }}
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Success!</h5>
+              </div>
+              <div className="modal-body">
+                <p>{messaege}</p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={closePopup}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
