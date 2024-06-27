@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../service/axiosInstance";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar.js/index.js";
 import CustomButton from "../components/Button.js/index.js";
+import { decodeJwt } from "../utils/decodeJwt.js";
 
 const ManageUsers = () => {
   const [users, setusers] = useState([]);
@@ -10,20 +11,11 @@ const ManageUsers = () => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [loading, setLoading] = useState(true); // State to track loading status
 
+  const {role} = decodeJwt();
+
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("Token not found in localStorage");
-        return;
-      }
-
-      const response = await axios.get("http://localhost:5000/user/details", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.get("/user/details");
       setusers(response.data.responseData);
       setLoading(false);
     } catch (error) {
@@ -39,12 +31,7 @@ const ManageUsers = () => {
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.delete("http://localhost:5000/user/delete", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await axios.delete("/user/delete", {
         data: { id: userToDelete },
       });
       console.log("User deleted:", response.data);
@@ -73,7 +60,7 @@ const ManageUsers = () => {
         <div className="d-flex justify-content-between my-4">
           <h2>Manage Users</h2>
           <Link
-           to={`/dashboard/userAddEdit?userId`}
+            to={`/dashboard/userAddEdit?userId`}
             className="text-primary mr-3"
             title="Create"
           >
@@ -119,7 +106,7 @@ const ManageUsers = () => {
                     </td>
                   </tr>
                 ))
-              ) : users.length > 0 ? (
+              ) : role === "admin" && users.length > 0 ? (
                 users.map((user) => (
                   <tr key={user._id} className="table_row">
                     <td>{user.name}</td>
@@ -151,7 +138,7 @@ const ManageUsers = () => {
                 // If users array is empty
                 <tr>
                   <td colSpan="7" className="text-center">
-                    Data not found!
+                    {role === 'admin' ? "Data not found!" : "You dont have admin privilage to access!" } 
                   </td>
                 </tr>
               )}

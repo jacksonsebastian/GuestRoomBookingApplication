@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import axios from "../service/axiosInstance";
+import { decodeJwt } from "../utils/decodeJwt";
 
 const AddEditRoom = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const {userId} = decodeJwt();
+  console.log("decodedToken:", userId)
   const searchParams = new URLSearchParams(location.search);
   const roomId = searchParams.get("roomId");
 
@@ -20,17 +23,17 @@ const AddEditRoom = () => {
     minBookingPeriod: Yup.number().required("Min booking period is required"),
     maxBookingPeriod: Yup.number().required("Max booking period is required"),
     rentAmount: Yup.number().required("Rent amount is required"),
-    amenities: Yup.array().min(1, "At least one amenity is required"),
+    amenities: Yup.string().required("Amenities is required"),
   });
 
   const defaultValues = {
     name: "",
     floorSize: null,
     numberOfBeds: null,
-    minBookingPeriod:null,
+    minBookingPeriod: null,
     maxBookingPeriod: null,
     rentAmount: null,
-    amenities: [],
+    amenities: "",
   };
 
   const {
@@ -48,9 +51,8 @@ const AddEditRoom = () => {
       try {
         if (roomId) {
           const response = await axios.post(
-            "http://localhost:5000/room/detailById",
+            "/room/detailById",
             { roomId },
-            { headers: { "Content-Type": "application/json" } }
           );
           const fetchedRoom = response.data.room;
           // Set form values from data
@@ -77,21 +79,17 @@ const AddEditRoom = () => {
       const roomData = {
         ...data,
         amenities: data.amenities.split(",").map((item) => item.trim()),
+        roomId: roomId ? roomId : undefined
       };
 
       if (roomId) {
-        const response = await axios.put(
-          `http://localhost:5000/room/update`,
-          { rooms: [roomData] },
-          { headers: { "Content-Type": "application/json" } }
-        );
+        const response = await axios.put(`/room/update`, { rooms: [roomData] });
         console.log("Room updated:", response.data);
       } else {
-        const response = await axios.post(
-          `http://localhost:5000/room/create`,
-          { rooms: [roomData] },
-          { headers: { "Content-Type": "application/json" } }
-        );
+        const response = await axios.post(`/room/create`, {
+          ownerId : userId ? userId : undefined,
+          rooms: [roomData],
+        });
         console.log("Room created:", response.data);
       }
       setShowPopup(true); // Show popup
@@ -102,7 +100,7 @@ const AddEditRoom = () => {
 
   const closePopup = () => {
     setShowPopup(false);
-    navigate("/dashboard/managebooking");
+    navigate("/dashboard/manageRooms");
   };
 
   return (

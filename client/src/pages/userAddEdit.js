@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../service/axiosInstance";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
@@ -21,6 +21,7 @@ const UserAddEdit = () => {
     role: Yup.string()
       .oneOf(["user", "admin"], "Invalid role")
       .required("Role is required"),
+    password: id ? null : Yup.string().required("Password is required"),
   });
 
   const {
@@ -42,16 +43,7 @@ const UserAddEdit = () => {
             return;
           }
 
-          const response = await axios.post(
-            "http://localhost:5000/user/detailById",
-            { id },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          const response = await axios.post("/user/detailById", { id });
           const fetchedRoom = response.data.responseData;
           // Set form values using setValue from react-hook-form
           setValue("name", fetchedRoom.name);
@@ -80,16 +72,7 @@ const UserAddEdit = () => {
           return;
         }
 
-        const response = await axios.put(
-          "http://localhost:5000/user/update",
-          userData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await axios.put("/user/update", userData);
         console.log("User updated:", response.data);
 
         setShowPopup(true);
@@ -100,19 +83,10 @@ const UserAddEdit = () => {
           return;
         }
 
-        const response = await axios.post(
-          "http://localhost:5000/user/create",
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await axios.post("/user/create", data);
 
         console.log("User created:", response.data);
-        setShowPopup(true); 
+        setShowPopup(true);
       }
     } catch (error) {
       console.error("Error submitting user:", error);
@@ -180,6 +154,25 @@ const UserAddEdit = () => {
             </select>
             <div className="invalid-feedback">{errors.role?.message}</div>
           </div>
+          {!id && (
+            <div className="row mb-3">
+              <div className="col-md-6 text-start">
+                <label className="mb-2" style={{ fontWeight: "bold" }}>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  className={`form-control ${
+                    errors.password ? "is-invalid" : ""
+                  }`}
+                  {...register("password")}
+                />
+                <div className="invalid-feedback">
+                  {errors.password?.message}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <button type="submit" className="btn btn-primary mt-3">
           {id ? "Update User" : "Add User"}

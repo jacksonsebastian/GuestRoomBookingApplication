@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../service/axiosInstance";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar.js/index.js";
 import CustomButton from "../components/Button.js/index.js";
@@ -12,7 +12,7 @@ const ManageRooms = () => {
 
   const fetchRooms = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/room/details");
+      const response = await axios.get("/room/details");
       setRooms(response.data.rooms);
       setLoading(false); // Set loading to false after data is fetched
     } catch (error) {
@@ -28,12 +28,7 @@ const ManageRooms = () => {
   const handleDeleteRoom = async () => {
     if (!roomToDelete) return;
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.delete("http://localhost:5000/room/delete", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await axios.delete("/room/delete", {
         data: { roomId: roomToDelete },
       });
       console.log("Room deleted:", response.data);
