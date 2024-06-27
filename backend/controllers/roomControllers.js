@@ -64,36 +64,36 @@ const updateRoom = async (req, res) => {
 };
 
 // Get all rooms
-// const getAllRooms = async (req, res) => {
-//   try {
-//     const rooms = await Room.find();
-//     res.json({ status: 1, message: "All rooms details!", rooms });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 const getAllRooms = async (req, res) => {
   const { startDate, endDate } = req.body;
 
   try {
-    let query = {};
+    // Find all rooms
+    const rooms = await Room.find();
 
-    // Check if startDate and endDate are provided and not empty
-    if (startDate && endDate && startDate !== "" && endDate !== "") {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-
-      const bookingPeriod = calculateBookingPeriod(start, end);
-
-      query = {
-        minBookingPeriod: { $lte: bookingPeriod },
-        maxBookingPeriod: { $gte: bookingPeriod }
-      };
+    if (!startDate || !endDate) {
+      // If no startDate and endDate are provided, return all rooms
+      return res.json({ status: 1, message: "All rooms details!", rooms });
     }
 
-    const rooms = await Room.find(query);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-    res.json({ status: 1, message: "Rooms details fetched successfully!", rooms });
+    // Calculate the number of days between startDate and endDate
+    const bookingPeriod = (end - start) / (1000 * 60 * 60 * 24) + 1; // +1 to include the start date
+
+    // Filter rooms based on the booking period
+    const filteredRooms = rooms.filter(
+      (room) =>
+        bookingPeriod >= room.minBookingPeriod &&
+        bookingPeriod <= room.maxBookingPeriod
+    );
+
+    res.json({
+      status: 1,
+      message: "Filtered rooms details!",
+      rooms: filteredRooms,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -102,10 +102,9 @@ const getAllRooms = async (req, res) => {
 // Helper function to calculate booking period in days
 function calculateBookingPeriod(startDate, endDate) {
   const diffTime = Math.abs(endDate - startDate);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
 }
-
 
 // Helper function to calculate booking period in days
 function calculateBookingPeriod(startDate, endDate) {
@@ -113,8 +112,6 @@ function calculateBookingPeriod(startDate, endDate) {
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Adding 1 to include both start and end dates
   return diffDays;
 }
-
-
 
 // Get room by ID
 const getRoomById = async (req, res) => {

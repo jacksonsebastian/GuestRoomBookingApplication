@@ -67,10 +67,8 @@ const RoomBooking = () => {
       try {
         setLoading(true);
         const response = await axiosInstance.post("/room/details", {
-          params: {
-            startDate,
-            endDate,
-          },
+          startDate,
+          endDate,
         });
         setRooms(
           response.data.rooms.map((room) => ({
