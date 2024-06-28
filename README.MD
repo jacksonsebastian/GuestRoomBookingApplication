@@ -152,7 +152,7 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 - Node.js and npm installed
 - MongoDB installed and running
 
-### Backaned project setup & installation
+### Backend project setup & installation
 # Navigate to the backend directory
 - cd /backend
 
