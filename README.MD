@@ -154,17 +154,17 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 ### Backaned project setup & installation
 # Navigate to the backen directory
--cd frontend/
+- cd frontend/
 
 # Install dependencies
--node version - v20.15.0
--npm install
+- node version - v20.15.0
+- npm install
 
 ### Frontend project setup & installation
 # Navigate to the frontend directory
--cd frontend/
+- cd frontend/
 
 # Install dependencies
--node version - v20.15.0
--npm install --legacy-peer-deps
+
+- npm install --legacy-peer-deps
 
