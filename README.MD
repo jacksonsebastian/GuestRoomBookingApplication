@@ -153,8 +153,8 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 - MongoDB installed and running
 
 ### Backaned project setup & installation
-# Navigate to the backen directory
-- cd frontend/
+# Navigate to the backend directory
+- cd /backend
 
 # Install dependencies
 - node version - v20.15.0
@@ -162,7 +162,7 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 ### Frontend project setup & installation
 # Navigate to the frontend directory
-- cd frontend/
+- cd /frontend
 
 # Install dependencies
 
